@@ -10,7 +10,7 @@ describe("Sanity check", function() {
 
   describe("fuzzer works", function() {
     it("mutate string", function() {
-        main.fuzzer.mutate.string("hello");
+        main.fuzzer.mutateString("hello");
     });
   });
 });
