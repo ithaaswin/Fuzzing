@@ -5,11 +5,12 @@ const stackTrace = require('stacktrace-parser');
 
 class fuzzer {
     static random() {
-        return new Random.Random(Random.MersenneTwister19937.seed(0));
+        return fuzzer._random || fuzzer.seed(0)
     }
     
     static seed (kernel) {
-        return new Random.Random(Random.MersenneTwister19937.seed(kernel));
+        fuzzer._random = new Random.Random(Random.MersenneTwister19937.seed(kernel));
+        return fuzzer._random;
     }
 
     static mutateString (val) {
