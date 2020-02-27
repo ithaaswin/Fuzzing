@@ -1,40 +1,35 @@
-var Random = require('random-js')
-    marqdown = require('./marqdown.js'),
-    fs = require('fs'),
-    stackTrace = require('stacktrace-parser')
-    ;
+const Random = require('random-js');
+const marqdown = require('./marqdown.js');
+const fs = require('fs');
+const stackTrace = require('stacktrace-parser');
 
-var fuzzer = 
-{
-    random : new Random(Random.engines.mt19937().seed(0)),
+class fuzzer {
+    static random() {
+        return new Random.Random(Random.MersenneTwister19937.seed(0));
+    }
     
-    seed: function (kernel)
-    {
-        fuzzer.random = new Random(Random.engines.mt19937().seed(kernel));
-    },
+    static seed (kernel) {
+        fuzzer.random = new Random.Random(Random.MersenneTwister19937.seed(kernel));
+    }
 
-    mutate:
-    {
-        string: function(val)
+    static mutateString (val) {
+        // MUTATE IMPLEMENTATION HERE
+        var array = val.split('');
+
+        if( fuzzer.random.bool(0.05) )
         {
-            // MUTATE IMPLEMENTATION HERE
-            var array = val.split('');
-
-            if( fuzzer.random.bool(0.05) )
-            {
-                // REVERSE
-            }
-            // delete random characters
-            if( fuzzer.random.bool(0.25) )
-            {
-                //fuzzer.random.integer(0,99)
-            }
-
-            // add random characters
-            // fuzzer.random.string(10)
-
-            return array.join('');
+            // REVERSE
         }
+        // With 25% chance, remove a random set of characters, from a random start position
+        if( fuzzer.random.bool(0.25) )
+        {
+            //fuzzer.random.integer(0,99)
+        }
+
+        // add random characters
+        // fuzzer.random.string(10)
+
+        return array.join('');
     }
 };
 
@@ -55,7 +50,7 @@ function mutationTesting(paths,iterations)
     
     for (var i = 0; i < iterations; i++) {
 
-        let mutuatedString = fuzzer.mutate.string(markDownA);
+        let mutuatedString = fuzzer.mutateString(markDownA);
         
         try
         {
