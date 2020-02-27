@@ -9,25 +9,25 @@ class fuzzer {
     }
     
     static seed (kernel) {
-        fuzzer.random = new Random.Random(Random.MersenneTwister19937.seed(kernel));
+        return new Random.Random(Random.MersenneTwister19937.seed(kernel));
     }
 
     static mutateString (val) {
         // MUTATE IMPLEMENTATION HERE
         var array = val.split('');
 
-        if( fuzzer.random.bool(0.05) )
+        if( fuzzer.random().bool(0.05) )
         {
             // REVERSE
         }
         // With 25% chance, remove a random set of characters, from a random start position
-        if( fuzzer.random.bool(0.25) )
+        if( fuzzer.random().bool(0.25) )
         {
             //fuzzer.random.integer(0,99)
         }
 
         // add random characters
-        // fuzzer.random.string(10)
+        // fuzzer.random().string(10)
 
         return array.join('');
     }
