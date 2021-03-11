@@ -36,7 +36,7 @@ See marqdown in use at [checkbox.io](http://checkbox.io/researchers.html).
 
 We will be using a mutation approach in this workshop. To assist, two files have been provided, `simple.md`, and `test.md`, which are markdown files read by the program.
 
-```js | {type: 'file', path: 'lib/mutate.js'}
+```js
 function mutateString (fuzzer, val) {
     var array = val.split('');
 
@@ -59,7 +59,7 @@ function mutateString (fuzzer, val) {
 exports.mutateString = mutateString;
 ```
 
-Running `node main.js` will output:
+Running `node index.js` will output:
 
     passed 1000, failed 0, reduced 0
 
@@ -104,6 +104,29 @@ But the fuzzer right now is just returning the same string!
 
 ### Generating Fuzzed Input Files
 
+```js | {type: 'file', path: 'lib/mutate.js'}
+function mutateString (fuzzer, val) {
+    var array = val.split('');
+
+    if( fuzzer.random().bool(0.05) )
+    {
+        // 1. REVERSE
+    }
+    // With 25% chance, remove a random set of characters, from a random start position
+    if( fuzzer.random().bool(0.25) )
+    {
+        // 2. fuzzer.random.integer(0,99)
+    }
+
+    // add random characters
+    // 3. fuzzer.random().string(10)
+
+    return array.join('');
+}
+
+exports.mutateString = mutateString;
+```
+
 Now, we need to generate mutations to the input file in order to discover failures. Add the following functionality:
 
 1. With 5% chance, reverse the input string.
@@ -124,6 +147,9 @@ See [random-js](https://www.npmjs.com/package/random-js) for tips on using some 
 ```javascript
 // for example, this will execute true for 5% of evaluations.
 if( fuzzer.random.bool(0.05) )
+```
+
+```| {type: 'terminal'}
 ```
 
 ### Minification
