@@ -36,29 +36,58 @@ See marqdown in use at [checkbox.io](http://checkbox.io/researchers.html).
 
 We will be using a mutation approach in this workshop. To assist, two files have been provided, `simple.md`, and `test.md`, which are markdown files read by the program.
 
-```| {type: 'terminal'}
+```js | {type: 'file', path: 'lib/mutate.js'}
+function mutateString (fuzzer, val) {
+    var array = val.split('');
+
+    if( fuzzer.random().bool(0.05) )
+    {
+        // 1. REVERSE
+    }
+    // With 25% chance, remove a random set of characters, from a random start position
+    if( fuzzer.random().bool(0.25) )
+    {
+        // 2. fuzzer.random.integer(0,99)
+    }
+
+    // add random characters
+    // 3. fuzzer.random().string(10)
+
+    return array.join('');
+}
+
+exports.mutateString = mutateString;
 ```
 
 Running `node main.js` will output:
 
     passed 1000, failed 0, reduced 0
-    
+
+```| {type: 'terminal'}
+```
+
 The program is simply reading an input file and for a 1000 times
 
 * asking a fuzzer to randomly change the string
 * passing the fuzzed input to marqdown and simply checking for exceptions being thrown (our *test oracle*):
 
 ```javascript
-    var markDown = fs.readFileSync('test.md','utf-8');
-    //var markDown = fs.readFileSync('simple.md','utf-8');
+function mutationTesting(iterations, inputFn, testFn)
+{    
+    var failedTests = [];
+    var reducedTests = [];
+    var passedTests = 0;
 
-    for (var i = 0; i < 1000; i++) {
+    fuzzer.seed(0);
+    
+    for (var i = 0; i < iterations; i++) {
 
-        var mutuatedString = fuzzer.mutate.string(markDown);
-
+        let str = inputFn();
+        let mutuatedString = fuzzer.mutateString(str);
+        
         try
         {
-            marqdown.render(mutuatedString);
+            testFn(mutuatedString);
             passedTests++;
         }
         catch(e)
@@ -66,30 +95,9 @@ The program is simply reading an input file and for a 1000 times
             failedTests.push( {input:mutuatedString, stack: e.stack} );
         }
     }
+    ...
 ```
 
-```js | {type: 'file', path: 'lib/mutate.js'}
-    function mutateString (fuzzer, val) {
-        var array = val.split('');
-
-        if( fuzzer.random().bool(0.05) )
-        {
-            // 1. REVERSE
-        }
-        // With 25% chance, remove a random set of characters, from a random start position
-        if( fuzzer.random().bool(0.25) )
-        {
-            // 2. fuzzer.random.integer(0,99)
-        }
-
-        // add random characters
-        // 3. fuzzer.random().string(10)
-
-        return array.join('');
-    }
-
-    exports.mutateString = mutateString;
-```
 
 
 But the fuzzer right now is just returning the same string!
