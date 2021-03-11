@@ -70,21 +70,20 @@ The program is simply reading an input file and for a 1000 times
 
 ```js | {type: 'file', path: 'lib/mutate.js'}
     function mutateString (fuzzer, val) {
-        // MUTATE IMPLEMENTATION HERE
         var array = val.split('');
 
         if( fuzzer.random().bool(0.05) )
         {
-            // REVERSE
+            // 1. REVERSE
         }
         // With 25% chance, remove a random set of characters, from a random start position
         if( fuzzer.random().bool(0.25) )
         {
-            //fuzzer.random.integer(0,99)
+            // 2. fuzzer.random.integer(0,99)
         }
 
         // add random characters
-        // fuzzer.random().string(10)
+        // 3. fuzzer.random().string(10)
 
         return array.join('');
     }
