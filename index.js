@@ -1,11 +1,12 @@
+const mtTest = require('./lib/driver').mutationTesting;
 const fs = require('fs');
 
+// Code under test...
 const marqdown = require('./test/marqdown');
-paths = ['test/test.md','test/simple.md'];
 
-var markDownA = fs.readFileSync(paths[0],'utf-8');
-var markDownB = fs.readFileSync(paths[1],'utf-8');
+// Inputs
+let mdA = fs.readFileSync('test/test.md','utf-8');
+let mdB = fs.readFileSync('test/simple.md','utf-8');
 
-const mutationTesting = require('./lib/driver').mutationTesting;
-
-mutationTesting(1000, () => markDownA, (x) => marqdown.render(x) );
+// Fuzz function 1000 times, given seed inputs.
+mtTest(1000, () => [mdA, mdB], (md) => marqdown.render(md) );
