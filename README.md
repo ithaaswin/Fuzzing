@@ -37,26 +37,18 @@ See marqdown in use at [checkbox.io](http://checkbox.io/researchers.html).
 We will be using a mutation approach in this workshop. To assist, two files have been provided, `simple.md`, and `test.md`, which are markdown files read by the program.
 
 ```js
-function mutateString (fuzzer, val) {
-    var array = val.split('');
+const mtfuzz = require('./lib/driver').mtfuzz;
+const fs = require('fs');
 
-    if( fuzzer.random().bool(0.05) )
-    {
-        // 1. REVERSE
-    }
-    // With 25% chance, remove a random set of characters, from a random start position
-    if( fuzzer.random().bool(0.25) )
-    {
-        // 2. fuzzer.random.integer(0,99)
-    }
+// Code under test...
+const marqdown = require('./test/marqdown');
 
-    // add random characters
-    // 3. fuzzer.random().string(10)
+// Seed inputs
+let mdA = fs.readFileSync('test/test.md','utf-8');
+let mdB = fs.readFileSync('test/simple.md','utf-8');
 
-    return array.join('');
-}
-
-exports.mutateString = mutateString;
+// Fuzz function 1000 times, with given seed string inputs.
+mtfuzz(1000, [mdA, mdB], (md) => marqdown.render(md) );
 ```
 
 Running `node index.js` will output:
@@ -66,25 +58,33 @@ Running `node index.js` will output:
 ```| {type: 'terminal'}
 ```
 
-The program is simply reading an input file and for a 1000 times
+The `mtfuzz` function will run 1000 times, each time
 
-* asking a fuzzer to randomly change the string
-* passing the fuzzed input to marqdown and simply checking for exceptions being thrown (our *test oracle*):
+* picking one of the seed inputs
+* applying a mutation to randomly change the string
+* passing input to system under test, and simply checking for exceptions being thrown (our *test oracle*).
+
+The code in `lib/driver.js` looks like this:
 
 ```javascript
-function mutationTesting(iterations, inputFn, testFn)
+function mtfuzz(iterations, seeds, testFn)
 {    
     var failedTests = [];
     var reducedTests = [];
     var passedTests = 0;
 
-    fuzzer.seed(0);
+    mutater.seed(0);
     
-    for (var i = 0; i < iterations; i++) {
+    for (var i = 1; i <= iterations; i++) {
 
-        let str = inputFn();
-        let mutuatedString = fuzzer.mutateString(str);
+        // Toggle between seed files
+        let idx = ((i % seeds.length) + seeds.length) % seeds.length;
+
+        // apply random mutation to seed input
+        let s = seeds[ idx ];
+        let mutuatedString = mutater.str(s);
         
+        // run given function under test with input
         try
         {
             testFn(mutuatedString);
@@ -98,11 +98,35 @@ function mutationTesting(iterations, inputFn, testFn)
     ...
 ```
 
+### Fuzzing Seed Inputs
 
+Right now, inside `mtfuzz`, the call `mutater.str(s)` is just returning the same string `s`!
 
-But the fuzzer right now is just returning the same string!
+It will be our job not modify this function to think of all sorts of interesting ways to randomly change it. And as a consquence, see if we can *reveal* faults in the code (Exceptions being thrown).
 
-### Generating Fuzzed Input Files
+We will be adding the following functionality:
+
+1. With 5% chance, reverse the input string.
+
+2. Alternate between templates (simple.md/test.md)
+
+3. With 25% chance, remove a random set of characters, from a random start position:
+  HINT: [See `Array.splice`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)
+  HINT: See `fuzzer.random.integer(0,99)` for creating a random number between 0-99.
+
+4. With a 25% chance, insert random characters into the string
+  HINT: [See insert array into another](http://stackoverflow.com/questions/7032550/javascript-insert-an-array-inside-another-array)
+  HINT: See `fuzzer.random.string(10)` for creating a random string of length 10.
+
+5. With a 5% chance, repeat. HINT: `do/while`
+
+See [random-js](https://www.npmjs.com/package/random-js) for tips on using some helpful random utilities.
+```javascript
+// for example, this will execute true for 5% of evaluations.
+if( fuzzer.random.bool(0.05) )
+```
+
+### lib/mutate.js
 
 ```js | {type: 'file', path: 'lib/mutate.js'}
 function mutateString (fuzzer, val) {
@@ -127,27 +151,7 @@ function mutateString (fuzzer, val) {
 exports.mutateString = mutateString;
 ```
 
-Now, we need to generate mutations to the input file in order to discover failures. Add the following functionality:
-
-1. With 5% chance, reverse the input string.
-
-2. Alternate between templates (simple.md/test.md)
-
-3. With 25% chance, remove a random set of characters, from a random start position:
-  HINT: [See `Array.splice`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)
-  HINT: See `fuzzer.random.integer(0,99)` for creating a random number between 0-99.
-
-4. With a 25% chance, insert random characters into the string
-  HINT: [See insert array into another](http://stackoverflow.com/questions/7032550/javascript-insert-an-array-inside-another-array)
-  HINT: See `fuzzer.random.string(10)` for creating a random string of length 10.
-
-5. With a 5% chance, repeat. HINT: `do/while`
-
-See [random-js](https://www.npmjs.com/package/random-js) for tips on using some helpful random utilities.
-```javascript
-// for example, this will execute true for 5% of evaluations.
-if( fuzzer.random.bool(0.05) )
-```
+You can run `node index.js` to see what effects your mutations has on the code!
 
 ```| {type: 'terminal'}
 ```
