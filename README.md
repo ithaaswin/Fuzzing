@@ -1,21 +1,43 @@
-[![build](https://travis-ci.org/CSC-DevOps/Fuzzing.svg?branch=master)](https://travis-ci.org/CSC-DevOps/Fuzzing)
+# Fuzzing and Mutation Testing
 
-The goal of this workshop is to use fuzzing to test a tool called `marqdown`, which takes a markdown file, and generates a html rendering of a survey:
+In this workshop, we'll learn about techniques related to random testing called fuzzing, and its close relationship to mutation testing.
 
-See marqdown in use at [checkbox.io](http://checkbox.io/researchers.html).
+## Setup
 
-### Fuzzing
+### Before you get started
+
+Import this as a notebook or clone this repo locally. Also, ensure you [install latest version of docable](https://github.com/ottomatica/docable-notebooks/blob/master/docs/install.md)!
+
+```bash
+docable-server import https://github.com/CSC-DevOps/Fuzzing
+```
+
+Install dependencies for our code.
+
+```bash | {type: 'command', failed_when: 'exitCode!=0'}
+npm install
+```
+
+
+## Fuzzing Concepts
 
 Fuzzing is a random testing techique. Fuzzing can be divided into "black-box" (dumb) and "white-box" (smart) approaches. In this workshop, we focus on "black-box" fuzzing. Generally, black-box fuzzing can be implemented in two ways:
 
 1. **generative**: test input is randomly created. Generation can be guided by grammars or other domain knowledge. This approach is commonly used for security testing.
 2. **mutation**: test input is randomly *modified*. The test input can be existing templates, input files, or captured network traffic that is replayed. Imagine you were testing Microsoft Word and you had a 200 page document. If you randomly made changes to the document and attempted to open it with Word&mdash;chances are you might be able to discover a bug.
 
-### Setup
+## Workshop
 
-Clone this repository and run `npm install`.
+The goal of this workshop is to use fuzzing to test a tool called `marqdown`, which takes a markdown file, and generates a html rendering of a survey:
+
+See marqdown in use at [checkbox.io](http://checkbox.io/researchers.html).
+
+### Getting Started
 
 We will be using a mutation approach in this workshop. To assist, two files have been provided, `simple.md`, and `test.md`, which are markdown files read by the program.
+
+```| {type: 'terminal'}
+```
 
 Running `node main.js` will output:
 
@@ -45,6 +67,31 @@ The program is simply reading an input file and for a 1000 times
         }
     }
 ```
+
+```js | {type: 'file', path: 'lib/mutate.js'}
+    function mutateString (fuzzer, val) {
+        // MUTATE IMPLEMENTATION HERE
+        var array = val.split('');
+
+        if( fuzzer.random().bool(0.05) )
+        {
+            // REVERSE
+        }
+        // With 25% chance, remove a random set of characters, from a random start position
+        if( fuzzer.random().bool(0.25) )
+        {
+            //fuzzer.random.integer(0,99)
+        }
+
+        // add random characters
+        // fuzzer.random().string(10)
+
+        return array.join('');
+    }
+
+    exports.mutateString = mutateString;
+```
+
 
 But the fuzzer right now is just returning the same string!
 

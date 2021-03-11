@@ -1,5 +1,6 @@
 var marked = require('marked');
 var fs = require('fs');
+const path = require('path');
 var JSON5 = require('json5');
 var pug = require('pug');
 var _ = require('underscore');
@@ -33,15 +34,15 @@ function loadPugTemplates()
 {
 	var options = {pretty:true};
 
-	var singlechoice = pug.compile(fs.readFileSync('pug/singlechoice.pug', 'utf8'),options);
-	var multichoice = pug.compile(fs.readFileSync('pug/multichoice.pug', 'utf8'),options);
-	var singlechoicetable = pug.compile(fs.readFileSync('pug/singlechoicetable.pug', 'utf8'),options);
-	var multichoicetable = pug.compile(fs.readFileSync('pug/multichoicetable.pug', 'utf8'),options);
-	var text = pug.compile(fs.readFileSync('pug/text.pug', 'utf8'),options);
-	var textarea = pug.compile(fs.readFileSync('pug/textarea.pug', 'utf8'),options);
-	var code = pug.compile(fs.readFileSync('pug/code.pug', 'utf8'),options);
+	var singlechoice = pug.compile(fs.readFileSync( path.join(__dirname, 'pug/singlechoice.pug'), 'utf8'),options);
+	var multichoice = pug.compile(fs.readFileSync( path.join(__dirname, 'pug/multichoice.pug'), 'utf8'),options);
+	var singlechoicetable = pug.compile(fs.readFileSync(  path.join(__dirname,'pug/singlechoicetable.pug'), 'utf8'),options);
+	var multichoicetable = pug.compile(fs.readFileSync(  path.join(__dirname,'pug/multichoicetable.pug'), 'utf8'),options);
+	var text = pug.compile(fs.readFileSync(  path.join(__dirname,'pug/text.pug'), 'utf8'),options);
+	var textarea = pug.compile(fs.readFileSync(  path.join(__dirname,'pug/textarea.pug'), 'utf8'),options);
+	var code = pug.compile(fs.readFileSync(  path.join(__dirname,'pug/code.pug'), 'utf8'),options);
 
-	var fileupload = pug.compile(fs.readFileSync('pug/upload.pug', 'utf8'),options);
+	var fileupload = pug.compile(fs.readFileSync(  path.join(__dirname,'pug/upload.pug'), 'utf8'),options);
 
 	return {
 		singlechoice: singlechoice,

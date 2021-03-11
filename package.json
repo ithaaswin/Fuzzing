@@ -8,20 +8,12 @@
   },
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "cross-env": "^5.0.5",
-    "fuzzer": "^0.2.0",
-    "istanbul": "^0.3.5",
-    "json5": "^0.5.1",
-    "marked": "^0.8.0",
-    "random-js": "^2.1.0",
-    "stack-trace": "0.0.9",
-    "stacktrace-parser": "^0.1.1",
-    "underscore": "^1.9.2"
-  },
   "dependencies": {
-    "chai": "^4.1.2",
-    "mocha": "^3.5.0",
-    "pug": "^2.0.4"
+    "json5": "^2.2.0",
+    "marked": "^2.0.1",
+    "pug": "^3.0.2",
+    "random-js": "^2.1.0",
+    "stacktrace-parser": "^0.1.10",
+    "underscore": "^1.12.0"
   }
 }
