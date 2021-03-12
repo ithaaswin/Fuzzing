@@ -47,30 +47,39 @@ const marqdown = require('./test/marqdown');
 let mdA = fs.readFileSync('test/test.md','utf-8');
 let mdB = fs.readFileSync('test/simple.md','utf-8');
 
-// Fuzz function 1000 times, with given seed string inputs.
-mtfuzz(1000, [mdA, mdB], (md) => marqdown.render(md) );
+let args = process.argv.slice(2);
+const runs = args.length > 0 ? args[0] : 1000;
+
+// Fuzz function 1000 (or given) times, with given seed string inputs.
+mtfuzz(runs, [mdA, mdB], (md) => marqdown.render(md) );
 ```
 
-Running `node index.js` will output:
+Running `node index.js` will output something like this:
 
-    passed 1000, failed 0, reduced 0
+```
+Fuzzing '(md) => marqdown.render(md)' with 1000 randomly generated-inputs.
+
+Finished 1000 runs.
+passed: 1000, exceptions: 0, faults: 0
+
+Discovered faults.
+```
 
 ```| {type: 'terminal'}
 ```
 
-The `mtfuzz` function will run 1000 times, each time
+The `mtfuzz` function will run 1000 times, each time:
 
-* picking one of the seed inputs
-* applying a mutation to randomly change the string
-* passing input to system under test, and simply checking for exceptions being thrown (our *test oracle*).
+* Picking one of the seed inputs.
+* Applying a mutation calling `mutater.str(s)` to randomly change the string.
+* Passing the random input to system under test, and simply checking for exceptions being thrown (our *test oracle*).
 
-The code in `lib/driver.js` looks like this:
+The code for these steps can be seen in `lib/driver.js`, which essentially looks something like this:
 
 ```javascript
 function mtfuzz(iterations, seeds, testFn)
 {    
     var failedTests = [];
-    var reducedTests = [];
     var passedTests = 0;
 
     mutater.seed(0);
@@ -102,29 +111,49 @@ function mtfuzz(iterations, seeds, testFn)
 
 Right now, inside `mtfuzz`, the call `mutater.str(s)` is just returning the same string `s`!
 
-It will be our job not modify this function to think of all sorts of interesting ways to randomly change it. And as a consquence, see if we can *reveal* faults in the code (Exceptions being thrown).
+It will be our job to modify this function in order to try all sorts of interesting ways to randomly change a string. And as a consquence, see if we can *reveal* faults in the code (i.e. Exceptions being thrown).
 
-We will be adding the following functionality:
+We will be adding the following functionality, while changing the effects it has on discovering faults:
 
-1. With 5% chance, reverse the input string.
+1. With 25% chance, remove a random set of characters, using [array.splice](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice) from a random start position.
 
-2. Alternate between templates (simple.md/test.md)
+  HINT: You can use the call `mutator.random().integer(0,num)` to randomly generate a number in a given range.
 
-3. With 25% chance, remove a random set of characters, from a random start position:
-  HINT: [See `Array.splice`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)
-  HINT: See `mutator.random.integer(0,99)` for creating a random number between 0-99.
+  🐕‍🦺: Run the code, did you see any faults?
 
-4. With a 25% chance, insert random characters into the string
-  HINT: [See insert array into another](http://stackoverflow.com/questions/7032550/javascript-insert-an-array-inside-another-array)
-  HINT: See `mutator.random.string(10)` for creating a random string of length 10.
+2. With a 25% chance, insert random characters into the string
 
-5. With a 5% chance, repeat. HINT: `do/while`
+  HINT: See `mutator.random().string(10)` for creating a random string of length 10.
+
+  🐕‍🦺: Run the code, did you see any new faults?
+
+3. With a 25% chance, replace any single quote strings with a random integer.
+
+   HINT: You can use a regex match/replace call like `val = val.replace(/'\w+'/g, randnum)`;
+
+  🐕‍🦺: Run the code, did you see any new faults?
+
+4. With a 25% chance, repeat (add a `do/while` loop).
+
+  🐕‍🦺: Run the code, did you see any new faults?
 
 See [random-js](https://www.npmjs.com/package/random-js) for tips on using some helpful random utilities.
 ```javascript
-// for example, this will execute true for 5% of evaluations.
+// for example, this will execute true for ~5% of evaluations.
 if( mutator.random.bool(0.05) )
 ```
+
+### Experiments
+
+1. Before any of your mutations, make a change to *always* reverse the input string (simply call `array.reverse()`, which will change the array in memory).
+
+   🤔 Do you think this will make the code find more faults or less? Why?
+
+   🔙 Revert the change when done with experiment.
+
+2. Increase the number of iterations run from 1000 to 15000. Did you find any new faults? Try with an even larger number, 100000. Did that make a difference?  Why do you think changing the number of runs might help reveal more faults (or not)?
+
+   HINT: You can simply pass the number of iterations as an argument: `node index.js 15000`.
 
 ### lib/mutate.js
 
