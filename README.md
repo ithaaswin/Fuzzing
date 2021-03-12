@@ -112,38 +112,38 @@ We will be adding the following functionality:
 
 3. With 25% chance, remove a random set of characters, from a random start position:
   HINT: [See `Array.splice`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)
-  HINT: See `fuzzer.random.integer(0,99)` for creating a random number between 0-99.
+  HINT: See `mutator.random.integer(0,99)` for creating a random number between 0-99.
 
 4. With a 25% chance, insert random characters into the string
   HINT: [See insert array into another](http://stackoverflow.com/questions/7032550/javascript-insert-an-array-inside-another-array)
-  HINT: See `fuzzer.random.string(10)` for creating a random string of length 10.
+  HINT: See `mutator.random.string(10)` for creating a random string of length 10.
 
 5. With a 5% chance, repeat. HINT: `do/while`
 
 See [random-js](https://www.npmjs.com/package/random-js) for tips on using some helpful random utilities.
 ```javascript
 // for example, this will execute true for 5% of evaluations.
-if( fuzzer.random.bool(0.05) )
+if( mutator.random.bool(0.05) )
 ```
 
 ### lib/mutate.js
 
 ```js | {type: 'file', path: 'lib/mutate.js'}
-function mutateString (fuzzer, val) {
+function mutateString (mutator, val) {
     var array = val.split('');
 
-    if( fuzzer.random().bool(0.05) )
+    if( mutator.random().bool(0.05) )
     {
         // 1. REVERSE
     }
     // With 25% chance, remove a random set of characters, from a random start position
-    if( fuzzer.random().bool(0.25) )
+    if( mutator.random().bool(0.25) )
     {
-        // 2. fuzzer.random.integer(0,99)
+        // 2. mutator.random.integer(0,99)
     }
 
     // add random characters
-    // 3. fuzzer.random().string(10)
+    // 3. mutator.random().string(10)
 
     return array.join('');
 }
