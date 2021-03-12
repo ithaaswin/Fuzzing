@@ -56,34 +56,6 @@ function loadPugTemplates()
 	};
 }
 
-
-function testFile()
-{
-	fs.readFile('test.md', 'utf8', function (err,data) {
-	  	if (err) {
-	    	return console.log(err);
-	  	}
-
-		marked.setOptions({gfm:true,tables:true});
-
-	  	var lines = data.split("\n");
-	  	var header = ReadHeader(lines);
-	  	var qOptions = JSON5.parse(header);
-
-	  	var body = ReadBody(lines);
-
-		var tokens = marked.lexer(body, {gfm:true,tables:true});
-
-		//console.log( new marked.Lexer().rules );
-		//console.log(tokens);
-		var newTokens = ProcessTokens(tokens, qOptions);
-
-		var tree = marked.parser(newTokens);
-
-		console.log(tree);
-	});
-}
-
 function ReadHeader(lines)
 {
 	var header = "";
@@ -160,6 +132,7 @@ function ProcessTokens(tokens, qOptions)
 
 	for( var i = 0; i < tokens.length; i++ )
 	{
+		// console.log( tokens[i].type );
 		var t = tokens[i];
 		newTokens.push(t);
 
@@ -222,7 +195,6 @@ function ProcessTokens(tokens, qOptions)
 
 			var choices = [];
 			var innerTokens = [];
-			var listKind = t.ordered;
 			var itemNumber = 0;
 			while( t && t.type != "list_end" )
 			{
@@ -251,7 +223,7 @@ function ProcessTokens(tokens, qOptions)
 			}
 
 			var html = "";
-			if( listKind )
+			if( t.ordered )
 			{
 				html = templates.singlechoice( {choices: choices} );
 				parentToken.text = parentHeader.format(questionNumber, 'singlechoice');
@@ -289,7 +261,8 @@ function ProcessTokens(tokens, qOptions)
 				var html = "";
 				if( json && json.upload )
 				{
-					html = templates.fileupload( {placeholder: json.placeholder, name: questionNumber} );
+					let name = (json.name.length > 0) ? json.name : questionNumber;
+					html = templates.fileupload( {placeholder: json.placeholder, name: name} );
 					parentToken.text = parentHeader.format(questionNumber, 'fileupload');					
 				}
 				else if( json && json.rows && json.rows > 1 )

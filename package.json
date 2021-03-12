@@ -10,8 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "json5": "^2.2.0",
-    "marked": "^2.0.1",
     "pug": "^3.0.2",
+    "marked": "0.8.0",
     "random-js": "^2.1.0",
     "stacktrace-parser": "^0.1.10",
     "underscore": "^1.12.0"
