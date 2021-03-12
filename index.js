@@ -8,5 +8,8 @@ const marqdown = require('./test/marqdown');
 let mdA = fs.readFileSync('test/test.md','utf-8');
 let mdB = fs.readFileSync('test/simple.md','utf-8');
 
-// Fuzz function 1000 times, with given seed string inputs.
-mtfuzz(1000, [mdA, mdB], (md) => marqdown.render(md) );
+let args = process.argv.slice(2);
+const runs = args.length > 0 ? args[0] : 1000;
+
+// Fuzz function 1000 (or given) times, with given seed string inputs.
+mtfuzz(runs, [mdA, mdB], (md) => marqdown.render(md) );
