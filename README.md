@@ -121,19 +121,20 @@ We will be adding the following functionality, while changing the effects it has
 
   🐕‍🦺: Run the code, did you see any faults?
 
-2. With a 25% chance, insert random characters into the string
+2. With a 25% chance, insert random characters into the string. 
 
+  HINT: Consider using `array.splice` with spread operator: `array.splice( rand_position, 0, ...rand_string)`.
   HINT: See `mutator.random().string(10)` for creating a random string of length 10.
 
   🐕‍🦺: Run the code, did you see any new faults?
 
-3. With a 25% chance, replace any single quote strings with a random integer.
+3. With a 50% chance, replace any single quote strings with a random integer.
 
    HINT: You can use a regex match/replace call like `val = val.replace(/'\w+'/g, randnum)`;
 
   🐕‍🦺: Run the code, did you see any new faults?
 
-4. With a 25% chance, repeat (add a `do/while` loop).
+4. With a 25% chance, steps 1 and 2 (add a `do/while` loop).
 
   🐕‍🦺: Run the code, did you see any new faults?
 
@@ -145,34 +146,35 @@ if( mutator.random.bool(0.05) )
 
 ### Experiments
 
-1. Before any of your mutations, make a change to *always* reverse the input string (simply call `array.reverse()`, which will change the array in memory).
+1. 🔙 Before your do while loop, make a change to *always* reverse the input string (simply call `array.reverse()`, which will change the array in memory).
 
    🤔 Do you think this will make the code find more faults or less? Why?
 
-   🔙 Revert the change when done with experiment.
+   Revert the change when done with experiment.
 
-2. Increase the number of iterations run from 1000 to 15000. Did you find any new faults? Try with an even larger number, 100000. Did that make a difference?  Why do you think changing the number of runs might help reveal more faults (or not)?
+2. ⚖️ Increase the number of iterations run from 1000 to 15000. Did you find any new faults? Try with an even larger number, 100000. Did that make a difference?  Why do you think changing the number of runs might help reveal more faults (or not)?
 
    HINT: You can simply pass the number of iterations as an argument: `node index.js 15000`.
 
 ### lib/mutate.js
 
+Make sure to click the "save" icon each time you edit the file.
+
 ```js | {type: 'file', path: 'lib/mutate.js'}
 function mutateString (mutator, val) {
+
+    // Step 3. Replace single quotes strings with integers
+
     var array = val.split('');
 
-    if( mutator.random().bool(0.05) )
-    {
-        // 1. REVERSE
-    }
-    // With 25% chance, remove a random set of characters, from a random start position
     if( mutator.random().bool(0.25) )
     {
-        // 2. mutator.random.integer(0,99)
+        // Step 1. Randomly remove a random set of characters, from a random start position.
     }
-
-    // add random characters
-    // 3. mutator.random().string(10)
+    if( mutator.random().bool(0.25) )
+    {
+        // Step 2. Randomly add a set of characters.
+    }
 
     return array.join('');
 }
