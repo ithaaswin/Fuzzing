@@ -28,9 +28,39 @@ Fuzzing is a random testing techique. Fuzzing can be divided into "black-box" (d
 
 ## Workshop
 
-The goal of this workshop is to use fuzzing to test a tool called `marqdown`, which takes a markdown file, and generates a html rendering of a survey:
+The goal of this workshop is to use fuzzing to test a tool called `marqdown`, which takes a markdown file 📄, and generates a html rendering of a survey 🗹. 
 
-See marqdown in use at [checkbox.io](http://checkbox.io/researchers.html).
+For example, the following markdown would be translated from: 📄
+
+------
+
+~~~md
+What is your favorite pet?
+> {rows:3}
+
+### Install
+
+![NPM version](https://badge.fury.io/js/marked.png)
+
+Did running this command work for you?
+
+``` bash
+npm install marked --save
+```
+1. Yes
+2. No
+
+### Upload a screenshot
+> {upload: true, name: 'hello'}
+~~~
+
+to: 🗹
+
+![checkbox rendered](img/checkbox.png)
+
+------
+
+See `marqdown` in use at [checkbox.io](http://checkbox.io/researchers.html).
 
 ### Getting Started
 
