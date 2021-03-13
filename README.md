@@ -2,6 +2,10 @@
 
 In this workshop, we'll learn about techniques related to random testing called fuzzing, and its close relationship to mutation testing.
 
+``` | {type: 'slides'}
+https://www.youtube.com/embed/YFhdo68Z3qU
+```
+
 ## Setup
 
 ### Before you get started
