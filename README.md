@@ -144,6 +144,19 @@ See [random-js](https://www.npmjs.com/package/random-js) for tips on using some 
 if( mutator.random.bool(0.05) )
 ```
 
+Note: Fuzzing may create many inputs that are revealing the same failure. This program attempts to reduce duplicate failures by discarding exceptions that reveal a failure location already found.
+
+```js
+var trace = failed.stack.split("\n");
+var msg = trace[0];
+var at = trace[1];
+
+if( !reduced.hasOwnProperty( at ) )
+{
+    reduced[at] = `${chalk.red(msg)}\nFailed with input: .mutations/${failed.id}.txt\n${chalk.grey(failed.stack)}`; 
+}
+```
+
 ### Experiments
 
 1. 🔙 Before your do while loop, make a change to *always* reverse the input string (simply call `array.reverse()`, which will change the array in memory).
@@ -187,38 +200,34 @@ You can run `node index.js` to see what effects your mutations has on the code!
 ```| {type: 'terminal'}
 ```
 
+### Integrating into pipeline stage
+
+There are several ways this can be added into a pipeline stage. In a continuous deployment pipeline you could add a stage for fuzz testing. If the built program could receive input, then fuzzing could simply performed by sending input into the binary.
+
+Alternatively, you could run fuzzing on specific methods with a codebase. One strategy would involve tagging code with a `@Fuzz` attribute, which could then be processed by a fuzzing program. Therefore, the fuzzing tool would generate random inputs for all the given methods, looking for failures.
+
+```
+@Fuzz
+private void exampleFunction2(String sTest, DataClass[] daTest) {
+    System.out.println("\tRunning with values: " + sTest + ", " + Arrays.toString(daTest));
+}
+```
+
+An previous undergrad student at NCSU, Johnny Rockett, built such a tool for Java/Maven, available here:
+https://github.com/johnnyrockett/ROG-Fuzzer
+
 ### Minification
 
-Fuzzing may create many inputs that are exercising the same bug.  A test suite minification step will attempt to discard test cases that are not any more effective.  Use stack trace to help determine if you are triggering the same bug, then only save the minimum tests needed (Inside `reducedTests`).
+In order to make revealing a fault easier, it is possible to automatically reduce the input, by systematically deleting the input and checking to see if the fault is still revealed. Typically, the process involves deleting parts of the input, until the smallest version of the input that still produces the error remains.
 
-### Reports
+An effective tool for doing this is `creduce`:
 
-Now that you've generated some failing test cases, what can you do?
+https://embed.cs.utah.edu/creduce/
 
-In a continuous deployment pipeline you could add a fuzzing component on new commits, and then reject them if you can generate failures. You might then generate a report, such as this:
 
-##### Example Report: 
+### Mutation Testing
 
-The following commit: "Add new JSON5 parser" failed with the following exception. See attached test case.
-```
-SyntaxError: Expected ':' instead of '' JSON5.parse.error
-    at JSON5.parse.error (/Users/gameweld/workshops/Fuzzing/node_modules/json5/lib/json5.js:50:25)
-    at JSON5.parse.next (/Users/gameweld/workshops/Fuzzing/node_modules/json5/lib/json5.js:62:17)
-    at JSON5.parse.object (/Users/gameweld/workshops/Fuzzing/node_modules/json5/lib/json5.js:443:21)
-    at JSON5.parse.value (/Users/gameweld/workshops/Fuzzing/node_modules/json5/lib/json5.js:467:20)
-    at Object.parse (/Users/gameweld/workshops/Fuzzing/node_modules/json5/lib/json5.js:491:18)
-    at ProcessTokens (/Users/gameweld/workshops/Fuzzing/marqdown.js:287:22)
-    at Object.exports.render (/Users/gameweld/workshops/Fuzzing/marqdown.js:25:18)
-    at mutationTesting (/Users/gameweld/workshops/Fuzzing/main.js:60:22)
-    at Object.<anonymous> (/Users/gameweld/workshops/Fuzzing/main.js:84:1)
-    at Module._compile (module.js:460:26)
-```
+How is fuzzing related to mutation testing?
 
-### Bonus
-
-Consider a generative approach based on the grammar of markdown.
-
-* Headers
-* Lists
-* Inline HTML
-* etc.
+Well, rather than randomly mutate inputs for a program, we can simply randomly mutate the program itself.
+We then check to see if our test suite will *pass* or *fail* on the faulty version of the program.
