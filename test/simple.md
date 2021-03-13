@@ -4,7 +4,7 @@
 
 > {rows:3, name: 333}
 
-[![NPM version](https://badge.fury.io/js/marked.png)][badge]
+![NPM version](https://badge.fury.io/js/marked.png)
 
 ### Install
 ``` bash
