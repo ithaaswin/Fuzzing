@@ -1,4 +1,4 @@
-# Fuzzing and Mutation Testing
+# Fuzzing
 
 In this workshop, we'll learn about techniques related to random testing called fuzzing, and its close relationship to mutation testing.
 
