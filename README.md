@@ -2,21 +2,17 @@
 
 In this workshop, we'll learn about techniques related to random testing called fuzzing, and its close relationship to mutation testing.
 
+<!--
 ``` | {type: 'slides'}
 https://www.youtube.com/embed/YFhdo68Z3qU
 ```
+-->
 
 ## Setup
 
 ### Before you get started
 
-Import this as a notebook or clone this repo locally. Also, ensure you [install latest version of docable](https://github.com/ottomatica/docable-notebooks/blob/master/docs/install.md)!
-
-```bash
-docable-server import https://github.com/CSC-DevOps/Fuzzing
-```
-
-Install dependencies for our code.
+Clone this repo locally and install dependencies for our code.
 
 ```bash | {type: 'command', failed_when: 'exitCode!=0'}
 npm install
@@ -240,7 +236,7 @@ There are several ways this can be added into a pipeline stage. In a continuous 
 
 Alternatively, you could run fuzzing on specific methods with a codebase. One strategy would involve tagging code with a `@Fuzz` attribute, which could then be processed by a fuzzing program. Therefore, the fuzzing tool would generate random inputs for all the given methods, looking for failures.
 
-```
+```java
 @Fuzz
 private void exampleFunction2(String sTest, DataClass[] daTest) {
     System.out.println("\tRunning with values: " + sTest + ", " + Arrays.toString(daTest));
